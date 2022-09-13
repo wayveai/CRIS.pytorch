@@ -7,7 +7,7 @@ torch
 torchvision
 scikit-build
 opencv-python
-scikit=image
+scikit-image
 wandb
 lmdb
 regex
