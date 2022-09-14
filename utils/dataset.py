@@ -107,7 +107,10 @@ class RefDataset(Dataset):
                                   0.40821073]).reshape(3, 1, 1)
         self.std = torch.tensor([0.26862954, 0.26130258,
                                  0.27577711]).reshape(3, 1, 1)
-        self.length = info[dataset][split]
+        try:
+            self.length = info[dataset][split]
+        except: 
+            self.length = 0
         self.env = None
 
     def _init_db(self):
@@ -189,6 +192,17 @@ class RefDataset(Dataset):
                 'sents': sents
             }
             return img, params
+        
+    def convert_image_to_tensor(self, image: np.ndarray):
+        mat, mat_inv = self.getTransformMat(image.shape[:2], True)
+        image = cv2.warpAffine(
+            image,
+            mat,
+            self.input_size,
+            flags=cv2.INTER_CUBIC,
+            borderValue=[0.48145466 * 255, 0.4578275 * 255, 0.40821073 * 255])
+        return self.convert(image)[0]
+        
 
     def getTransformMat(self, img_size, inverse=False):
         ori_h, ori_w = img_size

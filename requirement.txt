@@ -17,3 +17,4 @@ pycocotools
 matplotlib
 tqdm
 pyarrow==0.16.0
+jupyterlab
