@@ -1,10 +1,10 @@
 DATA:
   dataset: refcocog_g
-  train_lmdb: datasets/lmdb/refcocog_g/train.lmdb
+  train_lmdb: /dev/shm/datasets/lmdb/refcocog_g/train.lmdb
   train_split: train
-  val_lmdb: datasets/lmdb/refcocog_g/val.lmdb
+  val_lmdb: /dev/shm/datasets/lmdb/refcocog_g/val.lmdb
   val_split: val
-  mask_root: datasets/masks/refcocog_g
+  mask_root: /dev/shm/datasets/masks/refcocog_g
 TRAIN:
   # Base Arch
   clip_pretrain: pretrain/RN101.pt
@@ -22,7 +22,7 @@ TRAIN:
   dropout: 0.1
   intermediate: False
   # Training Setting
-  workers: 32  # data loader workers
+  workers: 64  # data loader workers
   workers_val: 16
   epochs: 50
   milestones: [35]
@@ -38,7 +38,7 @@ TRAIN:
   print_freq: 100
   # Resume & Save
   exp_name: CRIS_R101
-  output_folder: exp/refcocog_g
+  output_folder: /dev/shm/saurabh/refcocog_g
   save_freq: 1
   weight:  # path to initial weight (default: none)
   resume:  # path to latest checkpoint (default: none)
@@ -51,5 +51,5 @@ Distributed:
   rank: 0
 TEST:
   test_split: val-test
-  test_lmdb: datasets/lmdb/refcocog_g/val.lmdb
+  test_lmdb: /dev/shm/datasets/lmdb/refcocog_g/val.lmdb
   visualize: False
