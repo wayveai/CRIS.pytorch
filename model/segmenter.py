@@ -4,18 +4,32 @@ import torch.nn.functional as F
 
 from model.clip import build_model
 
-from .layers import FPN, Projector, TransformerDecoder
+from .layers import FPN, FPN_TF, Projector, TransformerDecoder
+
+from open_clip import tokenizer
+import open_clip
 
 
 class CRIS(nn.Module):
     def __init__(self, cfg):
         super().__init__()
         # Vision & Text Encoder
-        clip_model = torch.jit.load(cfg.clip_pretrain,
-                                    map_location="cpu").eval()
-        self.backbone = build_model(clip_model.state_dict(), cfg.word_len).float()
-        # Multi-Modal FPN
-        self.neck = FPN(in_channels=cfg.fpn_in, out_channels=cfg.fpn_out)
+        self.use_openclip = cfg.use_openclip
+        if not cfg.use_openclip:
+            clip_model = torch.jit.load(cfg.clip_pretrain,
+                                        map_location="cpu").eval()
+            self.backbone = build_model(clip_model.state_dict(), cfg.word_len).float()
+            self.neck = FPN(in_channels=cfg.fpn_in, out_channels=cfg.fpn_out)
+        else:
+
+            (
+                self.backbone, 
+                _, 
+                preprocess
+            ) = open_clip.create_model_and_transforms('ViT-L-14', pretrained='laion2b_s32b_b82k', cache_dir="/home/saurabh/", text_length=cfg.text_length)
+            self.backbone.float().eval()
+            self.neck = FPN_TF(in_channels=cfg.fpn_in, out_channels=cfg.fpn_out)
+
         # Decoder
         self.decoder = TransformerDecoder(num_layers=cfg.num_layers,
                                           d_model=cfg.vis_dim,
@@ -39,11 +53,14 @@ class CRIS(nn.Module):
         # vis: C3 / C4 / C5
         # word: b, length, 1024
         # state: b, 1024
-        vis = self.backbone.encode_image(img)
+        if self.use_openclip:
+            vis = self.backbone.visual.get_patch_wise_features(img)
+        else:
+            vis = self.backbone.visual(img)
         word, state = self.backbone.encode_text(word)
 
         # b, 512, 26, 26 (C4)
-        fq = self.neck(vis, state)
+        fq = self.neck(vis[-3:], state)
         b, c, h, w = fq.size()
         fq = self.decoder(fq, word, pad_mask)
         fq = fq.reshape(b, c, h, w)

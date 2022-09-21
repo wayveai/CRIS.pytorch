@@ -9,6 +9,8 @@ import torch
 from torch.utils.data import Dataset
 
 from .simple_tokenizer import SimpleTokenizer as _Tokenizer
+from open_clip import tokenize as tokenize_openclip
+
 
 info = {
     'refcoco': {
@@ -94,12 +96,13 @@ def loads_pyarrow(buf):
 
 class RefDataset(Dataset):
     def __init__(self, lmdb_dir, mask_dir, dataset, split, mode, input_size,
-                 word_length):
+                 word_length, use_openclip=False):
         super(RefDataset, self).__init__()
         self.lmdb_dir = lmdb_dir
         self.mask_dir = mask_dir
         self.dataset = dataset
         self.split = split
+        self.use_openclip = use_openclip
         self.mode = mode
         self.input_size = (input_size, input_size)
         self.word_length = word_length
@@ -166,7 +169,11 @@ class RefDataset(Dataset):
             mask = mask / 255.
             # sentence -> vector
             sent = sents[idx]
-            word_vec = tokenize(sent, self.word_length, True).squeeze(0)
+            if self.use_openclip:
+                word_vec = tokenize_openclip(sent, self.word_length).squeeze(0)
+            else:
+                word_vec = tokenize(sent, self.word_length, True).squeeze(0)
+
             img, mask = self.convert(img, mask)
             return img, word_vec, mask
         elif self.mode == 'val':

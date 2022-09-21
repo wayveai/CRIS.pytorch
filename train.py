@@ -121,14 +121,17 @@ def main_worker(gpu, args):
                             split=args.train_split,
                             mode='train',
                             input_size=args.input_size,
-                            word_length=args.word_len)
+                            word_length=args.text_length,
+                            use_openclip=args.use_openclip
+                            )
     val_data = RefDataset(lmdb_dir=args.val_lmdb,
                           mask_dir=args.mask_root,
                           dataset=args.dataset,
                           split=args.val_split,
                           mode='val',
                           input_size=args.input_size,
-                          word_length=args.word_len)
+                          word_length=args.text_length,
+                          use_openclip=args.use_openclip)
 
     # build dataloader
     init_fn = partial(worker_init_fn,

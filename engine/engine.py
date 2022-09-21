@@ -158,7 +158,6 @@ def inference(test_loader, model, args):
             seg_id = param['seg_id'][0].cpu().numpy()
             img_name = '{}-img.jpg'.format(seg_id)
             mask_name = '{}-mask.png'.format(seg_id)
-            print(mask_name)
             cv2.imwrite(filename=os.path.join(args.vis_dir, img_name),
                         img=param['ori_img'][0].cpu().numpy())
             cv2.imwrite(filename=os.path.join(args.vis_dir, mask_name),

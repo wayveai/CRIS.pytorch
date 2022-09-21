@@ -7,6 +7,7 @@ DATA:
   mask_root: datasets/masks/refcocog_u
 TRAIN:
   # Base Arch
+  use_openclip: False
   clip_pretrain: pretrain/RN101.pt
   input_size: 416
   word_len: 22
