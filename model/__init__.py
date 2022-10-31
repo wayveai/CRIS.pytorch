@@ -39,10 +39,12 @@ def build_segmenter(args):
         else:
             head.append(v)
     logger.info('Backbone with decay={}, Head={}'.format(len(backbone), len(head)))
-    param_list = [{
-        'params': backbone,
-        'initial_lr': args.lr_multi * args.base_lr
-    }, {
+    param_list = [
+        {
+            'params': backbone,
+            'initial_lr': 0.0
+        }, 
+        {
         'params': head,
         'initial_lr': args.base_lr
     }]

@@ -1,10 +1,10 @@
 DATA:
   dataset: refcocog_u
-  train_lmdb: datasets/lmdb/refcocog_u/train.lmdb
+  train_lmdb: /mnt/remote/data/refseg/datasets/lmdb/refcocog_u/train.lmdb
   train_split: train
-  val_lmdb: datasets/lmdb/refcocog_u/val.lmdb
+  val_lmdb: /mnt/remote/data/refseg/datasets/lmdb/refcocog_u/val.lmdb
   val_split: val
-  mask_root: datasets/masks/refcocog_u
+  mask_root: /mnt/remote/data/refseg/datasets/masks/refcocog_u
 TRAIN:
   # Base Arch
   use_openclip: False
@@ -25,24 +25,24 @@ TRAIN:
   # Training Setting
   workers: 64  # data loader workers
   workers_val: 32
-  epochs: 60
+  epochs: 100
   milestones: [35]
   start_epoch: 0
   batch_size: 64  # batch size for training
-  batch_size_val: 64  # batch size for validation during training, memory and speed tradeoff
+  batch_size_val: 32  # batch size for validation during training, memory and speed tradeoff
   base_lr: 0.0001
   lr_decay: 0.1
-  lr_multi: 0.1
+  lr_multi: 0.0
   weight_decay: 0.
   max_norm: 0.
   manual_seed: 0
   print_freq: 100
   # Resume & Save
-  exp_name: CRIS_R101
+  exp_name: CRIS_R101_fixed
   output_folder: exp/refcocog_u
-  save_freq: 1
+  save_freq: 10
   weight:  # path to initial weight (default: none)
-  resume:  # path to latest checkpoint (default: none)
+  resume:  exp/refcocog_u/CRIS_R101_fixed/last_model.pth # path to latest checkpoint (default: none)
   evaluate: True  # evaluate on validation set, extra gpu memory needed and small batch_size_val is recommend
 Distributed:
   dist_url: tcp://localhost:3681
@@ -52,5 +52,5 @@ Distributed:
   rank: 0
 TEST:
   test_split: val-test
-  test_lmdb: datasets/lmdb/refcocog_u/val.lmdb
-  visualize: False
+  test_lmdb: /mnt/remote/data/refseg/datasets/lmdb/refcocog_u/val.lmdb
+  visualize: True

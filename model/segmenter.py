@@ -19,6 +19,7 @@ class CRIS(nn.Module):
             clip_model = torch.jit.load(cfg.clip_pretrain,
                                         map_location="cpu").eval()
             self.backbone = build_model(clip_model.state_dict(), cfg.word_len).float()
+            self.backbone.requires_grad = False
             self.neck = FPN(in_channels=cfg.fpn_in, out_channels=cfg.fpn_out)
         else:
 
@@ -28,6 +29,7 @@ class CRIS(nn.Module):
                 preprocess
             ) = open_clip.create_model_and_transforms('ViT-L-14', pretrained='laion2b_s32b_b82k', cache_dir="/home/saurabh/", text_length=cfg.text_length)
             self.backbone.float().eval()
+            self.backbone.requires_grad = False
             self.neck = FPN_TF(in_channels=cfg.fpn_in, out_channels=cfg.fpn_out)
 
         # Decoder
